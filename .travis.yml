@@ -1,0 +1,20 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t tushartb/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true tushartb/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t tushartb/multi-client ./client
+  - docker build -t tushartb/multi-nginx ./nginx
+  - docker build -t tushartb/multi-server ./server
+  - docker build -t tushartb/multi-worker ./worker
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker push tushartb/multi-client
+  - docker push tushartb/multi-nginx
+  - docker push tushartb/multi-server
+  - docker push tushartb/multi-worker
