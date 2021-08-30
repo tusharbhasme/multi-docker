@@ -13,8 +13,20 @@ after_success:
   - docker build -t tushartb/multi-nginx ./nginx
   - docker build -t tushartb/multi-server ./server
   - docker build -t tushartb/multi-worker ./worker
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - echo '$DOCKER_PASSWORD' | docker login -u "$DOCKER_ID" --password-stdin
   - docker push tushartb/multi-client
   - docker push tushartb/multi-nginx
   - docker push tushartb/multi-server
   - docker push tushartb/multi-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: us-west-2
+  app: multi-docker
+  env: Multidocker-env
+  bucket_name: elasticbeanstalk-us-west-2-116127484844
+  bucket_path: docker-multi
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
